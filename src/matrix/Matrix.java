@@ -169,7 +169,6 @@ public class Matrix {
     }
 
     public Matrix multiple(Matrix m) throws MatrixDimensionException {
-        // Доделать
         if ((width != m.height) || (height != m.width)) {
             throw new MatrixDimensionException(this, m, "multiple");
         }
@@ -185,6 +184,10 @@ public class Matrix {
             }
         }
         return result;
+    }
+
+    public Matrix multiple(Vector v) throws MatrixDimensionException {
+        return this.multiple(v.getMatrix());
     }
 
     public Matrix transpone() {

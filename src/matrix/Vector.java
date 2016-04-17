@@ -38,10 +38,10 @@ public class Vector {
 
     // GETTER + SETTER
 
-    public Matrix getMatrix(boolean isHorizontal) {
+    public Matrix getMatrix(boolean isRow) {
         Matrix m;
         try {
-            if (isHorizontal) {
+            if (isRow) {
                 m = new Matrix(values.length, 1);
                 m.setRow(0, values);
             } else {
@@ -116,5 +116,7 @@ public class Vector {
         return sum;
     }
 
-
+    public Matrix multiple(Matrix m) throws MatrixDimensionException {
+        return this.getMatrix(true).multiple(m);
+    }
 }
