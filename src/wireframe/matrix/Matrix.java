@@ -1,8 +1,8 @@
-package matrix;
+package wireframe.matrix;
 
 
-import matrix.errors.MatrixDimensionException;
-import matrix.errors.VectorDimensionException;
+import wireframe.matrix.errors.MatrixDimensionException;
+import wireframe.matrix.errors.VectorDimensionException;
 
 public class Matrix {
     private double [][] values; // [Y][X]

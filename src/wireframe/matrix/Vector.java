@@ -1,7 +1,7 @@
-package matrix;
+package wireframe.matrix;
 
-import matrix.errors.MatrixDimensionException;
-import matrix.errors.VectorDimensionException;
+import wireframe.matrix.errors.MatrixDimensionException;
+import wireframe.matrix.errors.VectorDimensionException;
 
 public class Vector {
     private double [] values;
@@ -16,6 +16,18 @@ public class Vector {
 
     public Vector(Vector v) {
         values = v.values.clone();
+    }
+
+    public Vector(double x, double y) {
+        values = new double[] {x, y};
+    }
+
+    public Vector(double x, double y, double z) {
+        values = new double[] {x, y, z};
+    }
+
+    public Vector(double x, double y, double z, double a) {
+        values = new double[] {x, y, z, a};
     }
 
     // UTILS
@@ -84,10 +96,14 @@ public class Vector {
     public void setY(double value) { set(1, value); }
     public void setZ(double value) { set(2, value); }
 
+    public Point2DI getPoint2DI() {
+        return new Point2DI((int) getX(), (int) getY());
+    }
+
     // SCALAR
 
     public void multiple(double k) {
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; ++i) {
             values[i] *= k;
         }
     }
@@ -99,10 +115,14 @@ public class Vector {
             throw new VectorDimensionException(this, v, "plus");
         }
         Vector result = new Vector(this);
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; ++i) {
             result.values[i] += v.values[i];
         }
         return result;
+    }
+
+    public Vector move(Vector v) throws VectorDimensionException {
+        return plus(v);
     }
 
     public double multipleSum(Vector v) throws VectorDimensionException {
@@ -110,7 +130,7 @@ public class Vector {
             throw new VectorDimensionException(this, v, "plus");
         }
         double sum = 0.;
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; ++i) {
             sum += values[i] * v.values[i];
         }
         return sum;
@@ -118,5 +138,20 @@ public class Vector {
 
     public Matrix multiple(Matrix m) throws MatrixDimensionException {
         return this.getMatrix(true).multiple(m);
+    }
+
+    public double distance2(Vector v) throws VectorDimensionException {
+        if (values.length != v.values.length) {
+            throw new VectorDimensionException(this, v, "plus");
+        }
+        double d2 = 0;
+        for (int i = 0; i < values.length; ++i) {
+            d2 += (values[i] - v.values[i]) * (values[i] - v.values[i]);
+        }
+        return d2;
+    }
+
+    public double distance(Vector v) throws VectorDimensionException {
+        return Math.sqrt(distance2(v));
     }
 }
