@@ -154,4 +154,12 @@ public class Vector {
     public double distance(Vector v) throws VectorDimensionException {
         return Math.sqrt(distance2(v));
     }
+
+    public double calcPolynomial(double t) {
+        double result = 0;
+        for (int i = 0; i < values.length; ++i) {
+            result += Math.pow(t, values.length - i - 1) * values[i];
+        }
+        return result;
+    }
 }

@@ -115,8 +115,14 @@ class GraphViewPanel extends JPanel {
             drawLine(g2d, prevPoint, point);
             drawMiddleCircle(g2d, middlePoint);
 
-
             prevPoint = point;
+        }
+
+        g2d.setColor(Color.blue);
+
+        for(double t = 0; t < bSpline.pointsCount() - 3; t += 0.01) {
+            Point2DI point = coordToPoint(bSpline.calc(t));
+            g2d.drawLine(point.getX(), point.getY(), point.getX(), point.getY());
         }
     }
 

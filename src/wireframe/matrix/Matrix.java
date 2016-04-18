@@ -12,14 +12,24 @@ public class Matrix {
     public Matrix(int width, int height) {
         this.width = width;
         this.height = height;
-        this.values = new double[height][height];
+        this.values = new double[height][width];
     }
 
-    public Matrix(double[][] values) {
+    public void matrixInitValuesMultiptication(double[][] values, double multiplication) {
         this.values = values.clone();
         this.width = values[0].length;
         this.height = values.length;
+        this.multiple(multiplication);
     }
+
+    public Matrix(double[][] values, double multiplication) {
+        matrixInitValuesMultiptication(values, multiplication);
+    }
+
+    public Matrix(double [][] values) {
+        matrixInitValuesMultiptication(values, 1);
+    }
+
 
     private void createMatrixFromOther(Matrix m, boolean copyValues) {
         this.width = m.width;
@@ -27,7 +37,7 @@ public class Matrix {
         if (copyValues) {
             this.values = m.values.clone();
         } else {
-            this.values = new double[this.height][this.height];
+            this.values = new double[this.height][this.width];
         }
     }
 
@@ -169,7 +179,7 @@ public class Matrix {
     }
 
     public Matrix multiple(Matrix m) throws MatrixDimensionException {
-        if ((width != m.height) || (height != m.width)) {
+        if (width != m.height) {
             throw new MatrixDimensionException(this, m, "multiple");
         }
         Matrix result = new Matrix(m.width, this.height);
@@ -186,8 +196,8 @@ public class Matrix {
         return result;
     }
 
-    public Matrix multiple(Vector v) throws MatrixDimensionException {
-        return this.multiple(v.getMatrix());
+    public Vector multiple(Vector v) throws MatrixDimensionException {
+        return this.multiple(v.getMatrix()).getColumn(0);
     }
 
     public Matrix transpone() {
