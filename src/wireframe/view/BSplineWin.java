@@ -1,14 +1,12 @@
 package wireframe.view;
 
 import wireframe.BSpline;
-import wireframe.matrix.Matrix;
 import wireframe.matrix.Point2DI;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.VectorDimensionException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.*;
 

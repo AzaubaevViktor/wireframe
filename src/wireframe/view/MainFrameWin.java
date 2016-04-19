@@ -4,9 +4,12 @@ import java.awt.event.KeyEvent;
 
 public class MainFrameWin extends MainFrame {
     private final BSplineWin bsplineWin = new BSplineWin();
+    private final AboutWin about;
 
     public MainFrameWin(int x, int y, String title) {
         super(x, y, title);
+
+        about = new AboutWin();
 
         try {
             createAllMenus();
@@ -20,9 +23,13 @@ public class MainFrameWin extends MainFrame {
     private void createAllMenus() throws NoSuchMethodException {
         addSubMenu("Menu", KeyEvent.VK_M);
         addMenuItem("Menu/wireframe.BSpline", "Lol", KeyEvent.VK_B, "openBSplineWin");
+        addSubMenu("About", KeyEvent.VK_A);
+        addMenuItem("About/About", "Azaz", KeyEvent.VK_A, "showAbout");
     }
 
     public void openBSplineWin() {
         bsplineWin.setVisible(true);
     }
+
+    public void showAbout() { about.setVisible(true); }
 }

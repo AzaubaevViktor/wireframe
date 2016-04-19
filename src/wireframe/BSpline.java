@@ -20,13 +20,14 @@ public class BSpline {
             new double[] { 1,  4,  1, 0}
     }, 1./6.);
 
-    private void generateStart4Points() {
-        points.add(new Vector(new double[]{-0.1, -0.1}));
-        points.add(new Vector(new double[]{-0.1, 0.1}));
-        points.add(new Vector(new double[]{0.1, 0.1}));
-        points.add(new Vector(new double[]{0.1, -0.1}));
-        points.add(new Vector(new double[]{0.1, -0.2}));
+    private void generateStart6Points() {
+        points.add(new Vector(-0.2, -0.1));
+        points.add(new Vector(-0.1, 0.1));
+        points.add(new Vector(0.1, 0.1));
+        points.add(new Vector(0.1, -0.1));
+        points.add(new Vector(0.1, -0.2));
         points.add(new Vector(0, -0.1));
+        points.add(new Vector(0.2, -0.1));
         try {
             reCalcCurves();
         } catch (VectorDimensionException | MatrixDimensionException e) {
@@ -36,7 +37,7 @@ public class BSpline {
     }
 
     public BSpline(){
-        generateStart4Points();
+        generateStart6Points();
     }
 
     // CALCULATE SPLINE
