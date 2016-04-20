@@ -77,6 +77,8 @@ class GraphViewPanel extends JPanel {
         componentListenerInit();
     }
 
+    // GRAPHIC HELP
+
     private void componentListenerInit() {
         addComponentListener(new ComponentListener() {
             @Override
