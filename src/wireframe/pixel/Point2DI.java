@@ -1,6 +1,7 @@
-package wireframe.matrix;
+package wireframe.pixel;
 
 
+import wireframe.matrix.Vector;
 import wireframe.matrix.errors.VectorDimensionException;
 
 public class Point2DI {
@@ -10,6 +11,11 @@ public class Point2DI {
     public Point2DI(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Point2DI(double x, double y) {
+        this.x = (int) x;
+        this.y = (int) y;
     }
 
     public Point2DI(Point2DI p2di) {
@@ -48,9 +54,9 @@ public class Point2DI {
     public Point2DI divided(Point2DI p, double a) {
         // this -----a----- result ---1--- p
         return new Point2DI(
-                (int) ((this.x + p.x) * a / (a + 1)),
-                (int) ((this.y + p.y) * a / (a + 1))
-                );
+                ((this.x + p.x) * a / (a + 1)),
+                ((this.y + p.y) * a / (a + 1))
+        );
     }
 
     public String toString() {

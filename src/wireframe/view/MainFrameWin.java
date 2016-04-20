@@ -3,13 +3,14 @@ package wireframe.view;
 import java.awt.event.KeyEvent;
 
 public class MainFrameWin extends MainFrame {
-    private final BSplineWin bsplineWin = new BSplineWin();
+    private final BSplineWin bsplineWin;
     private final AboutWin about;
 
     public MainFrameWin(int x, int y, String title) {
         super(x, y, title);
 
         about = new AboutWin();
+        bsplineWin = new BSplineWin();
 
         try {
             createAllMenus();
