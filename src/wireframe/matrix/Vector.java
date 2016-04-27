@@ -195,4 +195,8 @@ public class Vector {
         }
         return result;
     }
+
+    public double[] getValues() {
+        return values.clone();
+    }
 }

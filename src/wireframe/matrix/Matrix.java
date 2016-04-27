@@ -15,6 +15,11 @@ public class Matrix {
         this.values = new double[height][width];
     }
 
+    public Matrix(int sqSize) {
+        this.width = this.height = sqSize;
+        this.values = new double[sqSize][sqSize];
+    }
+
     public void matrixInitValuesMultiptication(double[][] values, double multiplication) {
         this.values = values.clone();
         this.width = values[0].length;
@@ -109,6 +114,10 @@ public class Matrix {
         for (int y = 0; y < height; y++) {
             values[y][x] = column[y];
         }
+    }
+
+    public void setColumn(int x, Vector column) throws MatrixDimensionException {
+        setColumn(x, column.getValues());
     }
 
     public void setDiagonal(double [] values) {
