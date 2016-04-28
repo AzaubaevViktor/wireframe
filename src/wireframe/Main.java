@@ -19,6 +19,8 @@ public class Main {
         System.out.println("Created GUI on EDT? "+
                 SwingUtilities.isEventDispatchThread());
 
-        MainFrame mainFrameWin = new MainFrameWin(800, 600, "Штука");
+        Model model = new Model();
+
+        MainFrame mainFrameWin = new MainFrameWin(800, 600, "Штука", model);
     }
 }

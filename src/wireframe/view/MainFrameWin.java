@@ -1,16 +1,20 @@
 package wireframe.view;
 
+import wireframe.Model;
+
 import java.awt.event.KeyEvent;
 
 public class MainFrameWin extends MainFrame {
     private final BSplineWin bsplineWin;
     private final AboutWin about;
+    private final Model model;
 
-    public MainFrameWin(int x, int y, String title) {
+    public MainFrameWin(int x, int y, String title, Model model) {
         super(x, y, title);
 
         about = new AboutWin();
-        bsplineWin = new BSplineWin();
+        bsplineWin = new BSplineWin(model);
+        this.model = model;
 
         try {
             createAllMenus();

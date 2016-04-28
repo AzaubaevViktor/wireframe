@@ -1,37 +1,191 @@
 package wireframe.view;
 
 import wireframe.BSpline;
+import wireframe.Model;
 import wireframe.pixel.Point2DI;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.VectorDimensionException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Dimension2D;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
 public class BSplineWin extends JDialog {
     private GraphViewPanel graphViewPanel = new GraphViewPanel();
+    private JPanel paramsPanel = new JPanel();
+    private JPanel buttonsPanel = new JPanel();
+    private Model model;
+    private HashMap<String, Component> componentMap;
 
-    BSplineWin() {
-        this.setTitle("B-сплайн");
-        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    BSplineWin(Model model) {
+        setTitle("B-сплайн");
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        setLayout(new GridBagLayout());
+        this.model = model;
 
+        panelsInit();
         initGraphViewPanel();
 
+        addAllParams();
+        addAllButtons();
+
+        createComponentMap();
+
         pack();
-        this.setSize(640, 480);
+        setSize(640, 480);
     }
 
+    // INIT'S
+
     private void initGraphViewPanel() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = .89;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
         graphViewPanel.setBSpline(new BSpline());
-        this.add(graphViewPanel);
+        add(graphViewPanel, gbc);
+    }
+
+    private void panelsInit() {
+        paramsPanel.setLayout(new GridLayout(3, 10));
+        buttonsPanel.setLayout(new GridLayout(1, 3));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = .1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+
+        add(paramsPanel, gbc);
+        gbc.weighty = 0.01;
+        gbc.gridy = 2;
+        add(buttonsPanel, gbc);
+
+        paramsPanel.setVisible(true);
+        buttonsPanel.setVisible(true);
+    }
+
+    // HELPERS
+
+    private void createComponentMap() {
+        componentMap = new HashMap<String,Component>();
+        Component[] components = paramsPanel.getComponents();
+        for (Component component : components) {
+            componentMap.put(component.getName(), component);
+        }
+    }
+
+    public Component getComponentByName(String name) {
+        if (componentMap.containsKey(name)) {
+            return (Component) componentMap.get(name);
+        }
+        else return null;
+    }
+
+    private JFormattedTextField addInputField(String label, Object value) {
+        JLabel jLabel = new JLabel(label);
+        jLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        JFormattedTextField ftf = new JFormattedTextField(value);
+        ftf.setName(label);
+
+        paramsPanel.add(jLabel);
+        paramsPanel.add(ftf);
+        return ftf;
+    }
+
+    private JFormattedTextField addInputField(String label, Object value, String actionMethod) {
+        JFormattedTextField ftf = addInputField(label, value);
+        try {
+            final Method method = getClass().getMethod(actionMethod);
+            ftf.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    try {
+                        method.invoke(BSplineWin.this);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return ftf;
+    }
+
+    private JButton addButton(String label) {
+        JButton btn = new JButton(label);
+        btn.setName(label);
+        buttonsPanel.add(btn);
+        return btn;
+    }
+
+    private void addButton(String label, String actionMethod) {
+        JButton btn = addButton(label);
+        try {
+            final Method method = getClass().getMethod(actionMethod);
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        method.invoke(this, e);
+                    } catch (Exception err) {
+                        throw new RuntimeException(err);
+                    }
+                }
+            });
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ADDING
+
+    private void addAllParams() {
+        int[] intParams = model.getIntParams();
+        addInputField("n", intParams[0], "updateIntParams");
+        addInputField("m", intParams[1], "updateIntParams");
+        addInputField("k", intParams[2], "updateIntParams");
+
+        addInputField("№", 0);
+        addInputField("R", 0);
+        addInputField("a", 0);
+        addInputField("b", 1);
+        addInputField("c", 0);
+        addInputField("d", 6.28);
+        addInputField("G", 0);
+        addInputField("zn", 10);
+        addInputField("zf", 15);
+        addInputField("sw", 1);
+        addInputField("sh", 1);
+        addInputField("B", 255);
+    }
+
+    private void addAllButtons() {
+        addButton("Ok");
+        addButton("Apply");
+        addButton("Cancel");
+    }
+
+    // CONTROLLER
+
+    public void updateIntParams() {
+        int[] intParams = new int[3];
+        intParams[0] = (int) ((JFormattedTextField) getComponentByName("n")).getValue();
+        intParams[1] = (int) ((JFormattedTextField) getComponentByName("m")).getValue();
+        intParams[2] = (int) ((JFormattedTextField) getComponentByName("k")).getValue();
+        model.setIntParams(intParams);
     }
 }
 
@@ -54,7 +208,8 @@ class GraphViewPanel extends JPanel {
 
     GraphViewPanel() {
         super();
-        changeSize();
+        sizeChanged();
+        setMinimumSize(new Dimension(100, 100));
     }
 
     @Override
@@ -62,7 +217,7 @@ class GraphViewPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        changeSize();
+        sizeChanged();
 
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, size.getX(), size.getY());
@@ -83,7 +238,7 @@ class GraphViewPanel extends JPanel {
         addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
-                changeSize(e.getComponent().getWidth(), e.getComponent().getHeight());
+                sizeChanged(e.getComponent().getWidth(), e.getComponent().getHeight());
             }
 
             @Override
@@ -103,7 +258,7 @@ class GraphViewPanel extends JPanel {
         });
     }
 
-    private void changeSize(int width, int height) {
+    public void sizeChanged(int width, int height) {
         if ((size.getX() == width) && (size.getY() == height)) {
             return;
         }
@@ -118,9 +273,9 @@ class GraphViewPanel extends JPanel {
         centerP = centerV.getPoint2DI();
     }
 
-    private void changeSize() {
+    private void sizeChanged() {
         Dimension size = getSize();
-        changeSize(size.width, size.height);
+        sizeChanged(size.width, size.height);
     }
 
     private void mouseListenerInit() {
