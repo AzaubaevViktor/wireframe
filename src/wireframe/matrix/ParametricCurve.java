@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParametricCurve {
-    static final int N = 100; // На сколько частей делится кривая при подсчёте длинны
-    private final Vector y;
-    private final Vector x;
+    private static final int N = 100; // На сколько частей делится кривая при подсчёте длинны
+    private Vector y;
+    private Vector x;
     private List<Double> tByL;
     private List<Vector> pointByIndex;
     private double len = 0;
@@ -26,6 +26,15 @@ public class ParametricCurve {
                 x.calcPolynomial(t),
                 y.calcPolynomial(t)
         );
+    }
+
+    public void apply(Vector x, Vector y) throws VectorDimensionException {
+        if (x.length() != y.length()) {
+            throw new VectorDimensionException(x, y, "Подсчёт параметрической кривой");
+        }
+        this.x = x;
+        this.y = y;
+        calculateT2L();
     }
 
     public void calculateT2L() {

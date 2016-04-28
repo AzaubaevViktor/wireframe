@@ -82,6 +82,15 @@ public class BSpline {
         recalcSize();
     }
 
+    private void reCalc(int segmentIFrom, int segmentITo) {
+        try {
+            reCalcCurves(segmentIFrom, segmentITo);
+        } catch (VectorDimensionException | MatrixDimensionException e) {
+            e.printStackTrace();
+        }
+        recalcSize();
+    }
+
     private void recalcSize() {
         leftUp = new Vector(Double.MAX_VALUE, Double.MAX_VALUE);
         rightDown = new Vector(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -106,15 +115,39 @@ public class BSpline {
     }
 
     private void reCalcCurves() throws VectorDimensionException, MatrixDimensionException {
-        // Сделать пересчёт некоторых кривых, а не всех
         curves.clear();
+        for (int segmentI = 1; segmentI < points.size() - 3 + 1; ++segmentI) {
+            curves.add(calcSegment(segmentI));
+        }
+        reCalcLen();
+    }
+
+    private void reCalcCurves(int segmentIFrom, int segmentITo) throws VectorDimensionException, MatrixDimensionException {
+        if (segmentITo > points.size() - 3 + 1) {
+            segmentITo = points.size() - 3 + 1;
+        }
+
+        if (segmentIFrom < 1) {
+            segmentIFrom = 1;
+        }
+
+        for (int i = segmentIFrom; i < segmentITo; ++i) {
+            ParametricCurve curve = curves.get(i - 1);
+            curve.apply(
+                    M.multiple(getXVector(i)),
+                    M.multiple(getYVector(i))
+            );
+        }
+
+        reCalcLen();
+    }
+
+    private void reCalcLen() {
         len = 0;
         lBySegments = new ArrayList<>();
         lBySegments.add(0.);
 
-        for (int i = 1; i < points.size() - 3 + 1; ++i) {
-            ParametricCurve curve = calcSegment(i);
-            curves.add(curve);
+        for (ParametricCurve curve : curves) {
             len += curve.getLen();
             lBySegments.add(len);
         }
@@ -167,7 +200,7 @@ public class BSpline {
     public void movePoint(int index, Vector value) {
         this.points.get(index).apply(value);
 
-        reCalc();
+        reCalc(index - 2, index + 2);
     }
 
     public void addPoint(int index, Vector value) {
