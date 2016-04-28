@@ -1,6 +1,7 @@
 package wireframe.view;
 
 import wireframe.BSpline;
+import wireframe.Figure3D;
 import wireframe.Model;
 import wireframe.pixel.Point2DI;
 import wireframe.matrix.Vector;
@@ -17,7 +18,7 @@ import java.util.*;
 import java.util.List;
 
 public class BSplineWin extends JDialog {
-    private GraphViewPanel graphViewPanel = new GraphViewPanel();
+    private GraphViewPanel graphViewPanel;
     private JPanel paramsPanel = new JPanel();
     private JPanel buttonsPanel = new JPanel();
     private Model model;
@@ -29,8 +30,8 @@ public class BSplineWin extends JDialog {
         setLayout(new GridBagLayout());
         this.model = model;
 
-        panelsInit();
         initGraphViewPanel();
+        panelsInit();
 
         addAllParams();
         addAllButtons();
@@ -52,7 +53,9 @@ public class BSplineWin extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        graphViewPanel.setBSpline(new BSpline());
+        graphViewPanel = new GraphViewPanel(model);
+
+        graphViewPanel.setFigure3D(new Figure3D());
         add(graphViewPanel, gbc);
     }
 
@@ -113,6 +116,8 @@ public class BSplineWin extends JDialog {
                 public void propertyChange(PropertyChangeEvent evt) {
                     try {
                         method.invoke(BSplineWin.this);
+                        graphViewPanel.reCalcObjects();
+                        graphViewPanel.repaint();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -190,9 +195,10 @@ public class BSplineWin extends JDialog {
 }
 
 class GraphViewPanel extends JPanel {
+    private final Model model;
     private BufferedImage img;
-    private BSpline bSpline;
-    private BSpline bSplineOrigin;
+    private Figure3D figure3D;
+    private Figure3D figure3DOrigin;
     private double drawK = 0.;
     private Point2DI size = new Point2DI(0, 0);
     private Vector centerV = new Vector(0, 0);
@@ -206,8 +212,9 @@ class GraphViewPanel extends JPanel {
     private List<Point2DI> points;
     private List<Point2DI> middlePoints;
 
-    GraphViewPanel() {
+    GraphViewPanel(Model model) {
         super();
+        this.model = model;
         sizeChanged();
         setMinimumSize(new Dimension(100, 100));
     }
@@ -289,7 +296,7 @@ class GraphViewPanel extends JPanel {
                 curMovingPointIndex = getPointIndex(points, pointRectSide, pointRectSide, p);
                 if (curMovingPointIndex != -1) {
                     if (e.getButton() == 3) {
-                        bSpline.deletePoint(curMovingPointIndex);
+                        figure3D.bSpline.deletePoint(curMovingPointIndex);
                         curMovingPointIndex = -1;
                         reCalcObjects();
                     }
@@ -299,7 +306,7 @@ class GraphViewPanel extends JPanel {
                             middleCircleSize,
                             p) + 1;
                     if (addingIndex != 0) {
-                        bSpline.addPoint(addingIndex, pointToValue(p.getX(), p.getY()));
+                        figure3D.bSpline.addPoint(addingIndex, pointToValue(p.getX(), p.getY()));
                         curMovingPointIndex = addingIndex;
                     }
                 }
@@ -314,7 +321,7 @@ class GraphViewPanel extends JPanel {
         addMouseMotionListener(new MouseAdapter() {
             public void mouseDragged(MouseEvent e) {
                 if (curMovingPointIndex != -1) {
-                    bSpline.movePoint(curMovingPointIndex, pointToValue(e.getX(), e.getY()));
+                    figure3D.bSpline.movePoint(curMovingPointIndex, pointToValue(e.getX(), e.getY()));
                 }
                 repaint();
             }
@@ -400,17 +407,31 @@ class GraphViewPanel extends JPanel {
             drawMiddleCircle(g2d, mPoint);
         }
 
-        g2d.setColor(Color.blue);
+        prevPoint = null;
 
-        for (double t = 0; t < bSpline.pointsCount() - 3; t += .01) {
-            Point2DI point = valueToPoint(bSpline.calcT(t)).getPoint2DI();
-            g2d.drawLine(point.getX(), point.getY(), point.getX(), point.getY());
-        }
+        int pointI = 0;
 
-        g2d.setColor(Color.GREEN);
-        for (double l = 0; l < bSpline.getLen(); l += .1) {
-            Point2DI point = valueToPoint(bSpline.calcL(l)).getPoint2DI();
-            g2d.drawLine(point.getX(), point.getY(), point.getX(), point.getY());
+        for (double l = model.getA(); l < model.getB(); l += model.getdL()) {
+            Point2DI point = valueToPoint(
+                    figure3D.bSpline.calcL(
+                            l * figure3D.bSpline.getLen()
+                    )
+            ).getPoint2DI();
+
+            if (prevPoint == null) {
+                prevPoint = point;
+            }
+
+            g2d.setColor(figure3D.color);
+            g2d.drawLine(prevPoint.getX(), prevPoint.getY(), point.getX(), point.getY());
+
+            if (pointI % model.getN() == 0) {
+                g2d.setColor(figure3D.color.brighter().brighter());
+                g2d.drawLine(prevPoint.getX(), prevPoint.getY(), prevPoint.getX(), prevPoint.getY());
+            }
+
+            prevPoint = point;
+            pointI += 1;
         }
 
     }
@@ -419,7 +440,7 @@ class GraphViewPanel extends JPanel {
         points = new ArrayList<>();
         middlePoints = new ArrayList<>();
 
-        for (Iterator<Vector> vectorIterator = bSpline.getPointsIterator(); vectorIterator.hasNext();) {
+        for (Iterator<Vector> vectorIterator = figure3D.bSpline.getPointsIterator(); vectorIterator.hasNext();) {
             points.add(valueToPoint(vectorIterator.next()).getPoint2DI());
         }
 
@@ -432,9 +453,9 @@ class GraphViewPanel extends JPanel {
         }
     }
 
-    public void setBSpline(BSpline bSpline) {
-        this.bSplineOrigin = bSpline;
-        this.bSpline = new BSpline(this.bSplineOrigin);
+    public void setFigure3D(Figure3D figure3D) {
+        this.figure3DOrigin = figure3D;
+        this.figure3D = new Figure3D(this.figure3DOrigin);
         reCalcObjects();
     }
 }
