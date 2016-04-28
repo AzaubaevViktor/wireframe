@@ -9,7 +9,8 @@ public class ParametricCurve {
     static final int N = 100; // На сколько частей делится кривая при подсчёте длинны
     private final Vector y;
     private final Vector x;
-    private List<Double> t2l;
+    private List<Double> tByL;
+    private List<Vector> pointByIndex;
     private double len = 0;
 
     public ParametricCurve(Vector x, Vector y) throws VectorDimensionException {
@@ -29,15 +30,20 @@ public class ParametricCurve {
 
     public void calculateT2L() {
         double l = 0.;
-        t2l = new ArrayList<>();
-        t2l.add(0.);
+        tByL = new ArrayList<>();
+        pointByIndex = new ArrayList<>();
+
         Vector prev = calcT(0);
+        tByL.add(0.);
+        pointByIndex.add(prev);
+
         Vector cur;
         for (int i = 1; i <= N; i += 1) {
             cur = calcT((double) i / N);
             try {
                 l += cur.distance(prev);
-                t2l.add(l);
+                tByL.add(l);
+                pointByIndex.add(cur);
             } catch (VectorDimensionException e) {
                 e.printStackTrace();
             }
@@ -47,13 +53,13 @@ public class ParametricCurve {
     }
 
     public double getLen() {
-        if (t2l == null) {
+        if (tByL == null) {
             calculateT2L();
         }
         return len;
     }
 
-    private double getTByL(double l) {
+    private int getLeftIndexByL(double l) {
         if (l < 0) { return 0; }
         if (l > getLen()) { return 1; }
         int leftTmulN = 0;
@@ -61,21 +67,30 @@ public class ParametricCurve {
 
         while (rightTmulN - leftTmulN > 1) {
             int middleI = (leftTmulN + rightTmulN) / 2;
-            if (l < t2l.get(middleI)) {
+            if (l < tByL.get(middleI)) {
                 rightTmulN = middleI;
             } else {
                 leftTmulN = middleI;
             }
         }
-        double ll = t2l.get(leftTmulN);
-        double lr = t2l.get(rightTmulN);
-        return ((l - ll) / (lr - ll) + leftTmulN) / (double) N;
+        return leftTmulN;
     }
 
     public Vector calcL(double l) {
-        if (t2l == null) {
+        if (tByL == null) {
             calculateT2L();
         }
-        return calcT(getTByL(l));
+        int leftTmulN = getLeftIndexByL(l);
+        double ll = tByL.get(leftTmulN);
+        double lr = tByL.get(leftTmulN + 1);
+        try {
+            return pointByIndex.get(leftTmulN).divided(
+                    pointByIndex.get(leftTmulN + 1),
+                    (l - ll) / (lr - l)
+            );
+        } catch (VectorDimensionException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

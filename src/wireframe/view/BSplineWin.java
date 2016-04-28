@@ -425,7 +425,7 @@ class GraphViewPanel extends JPanel {
             g2d.setColor(figure3D.color);
             g2d.drawLine(prevPoint.getX(), prevPoint.getY(), point.getX(), point.getY());
 
-            if (pointI % model.getN() == 0) {
+            if (pointI % model.getK() == 0) {
                 g2d.setColor(figure3D.color.brighter().brighter());
                 g2d.drawLine(prevPoint.getX(), prevPoint.getY(), prevPoint.getX(), prevPoint.getY());
             }

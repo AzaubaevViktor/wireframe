@@ -138,6 +138,10 @@ public class Vector {
         return plus(v, 1);
     }
 
+    public Vector minus(Vector v) throws VectorDimensionException {
+        return plus(v, -1.);
+    }
+
     public Vector move(Vector v) throws VectorDimensionException {
         return plus(v);
     }
@@ -182,10 +186,10 @@ public class Vector {
             throw new VectorDimensionException(this, v, "plus");
         }
 
-        Vector result = this.plus(v);
-        result.multiple(a / (a + 1));
+        Vector diff = v.minus(this);
+        diff.multiple(a / (a + 1));
 
-        return result;
+        return this.plus(diff);
     }
 
     public double calcPolynomial(double t) {
