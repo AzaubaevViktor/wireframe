@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public class BSpline {
     private List<Vector> points = new ArrayList<>();
     private List<ParametricCurve> curves = new ArrayList<>();
+    private List<Double> lBySegments;
+    private double len;
 
     private Vector leftUp, rightDown;
 
@@ -106,20 +108,54 @@ public class BSpline {
     private void reCalcCurves() throws VectorDimensionException, MatrixDimensionException {
         // Сделать пересчёт некоторых кривых, а не всех
         curves.clear();
+        len = 0;
+        lBySegments = new ArrayList<>();
+        lBySegments.add(0.);
+
         for (int i = 1; i < points.size() - 3 + 1; ++i) {
-            curves.add(calcSegment(i));
+            ParametricCurve curve = calcSegment(i);
+            curves.add(curve);
+            len += curve.getLen();
+            lBySegments.add(len);
         }
     }
 
-    public Vector calc(double t) {
+    public Vector calcT(double t) {
         int segmentIndex = (int) Math.floor(t);
-        return curves.get(segmentIndex).calc(t - segmentIndex);
+        return curves.get(segmentIndex).calcT(t - segmentIndex);
+    }
+
+    private int getSegmentByL(double l) {
+        if (l < 0) { return 0; }
+        if (l > getLen()) { return curves.size(); }
+
+        int leftI = 0;
+        int rightI = curves.size();
+
+        while (rightI - leftI > 1) {
+            int middleI = (leftI + rightI) / 2;
+            if (l < lBySegments.get(middleI)) {
+                rightI = middleI;
+            } else {
+                leftI = middleI;
+            }
+        }
+        return leftI;
+    }
+
+    public Vector calcL(double l) {
+        int segmentI = getSegmentByL(l);
+        return curves.get(segmentI).calcL(l - lBySegments.get(segmentI));
     }
 
     // GETTER + SETTER
 
-    public Vector[] getSize() {
+    public Vector[] getEnvRect() {
         return new Vector[]{leftUp, rightDown};
+    }
+
+    public double getLen() {
+        return len;
     }
 
     // UTILS

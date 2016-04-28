@@ -403,7 +403,13 @@ class GraphViewPanel extends JPanel {
         g2d.setColor(Color.blue);
 
         for (double t = 0; t < bSpline.pointsCount() - 3; t += .01) {
-            Point2DI point = valueToPoint(bSpline.calc(t)).getPoint2DI();
+            Point2DI point = valueToPoint(bSpline.calcT(t)).getPoint2DI();
+            g2d.drawLine(point.getX(), point.getY(), point.getX(), point.getY());
+        }
+
+        g2d.setColor(Color.GREEN);
+        for (double l = 0; l < bSpline.getLen(); l += .1) {
+            Point2DI point = valueToPoint(bSpline.calcL(l)).getPoint2DI();
             g2d.drawLine(point.getX(), point.getY(), point.getX(), point.getY());
         }
 
