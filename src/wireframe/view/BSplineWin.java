@@ -1,6 +1,5 @@
 package wireframe.view;
 
-import wireframe.BSpline;
 import wireframe.Figure3D;
 import wireframe.Model;
 import wireframe.pixel.Point2DI;
@@ -199,7 +198,7 @@ class GraphViewPanel extends JPanel {
     private BufferedImage img;
     private Figure3D figure3D;
     private Figure3D figure3DOrigin;
-    private double drawK = 0.;
+    private double drawK = 0.; // сколько пикселей в 1чке
     private Point2DI size = new Point2DI(0, 0);
     private Vector centerV = new Vector(0, 0);
     private Point2DI centerP;
@@ -225,6 +224,7 @@ class GraphViewPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         sizeChanged();
+        calcDrawK();
 
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, size.getX(), size.getY());
@@ -234,6 +234,7 @@ class GraphViewPanel extends JPanel {
         g2d.drawLine(centerP.getX(), 0, centerP.getX(), size.getY());
         reCalcObjects();
         drawBSpline(g2d);
+        drawMarks(g2d);
 
         mouseListenerInit();
         componentListenerInit();
@@ -271,8 +272,7 @@ class GraphViewPanel extends JPanel {
         }
         size.setX(width);
         size.setY(height);
-        drawK = Math.min(width, height);
-        pointRectSide = (int) Math.max(drawK / 300, MIN_POINT_RECT_SIZE);
+        pointRectSide = Math.max(Math.min(width, height) / 300, MIN_POINT_RECT_SIZE);
         middleCircleSize = pointRectSide * 2 / 3;
 
         centerV.setX(width / 2);
@@ -283,6 +283,17 @@ class GraphViewPanel extends JPanel {
     private void sizeChanged() {
         Dimension size = getSize();
         sizeChanged(size.width, size.height);
+    }
+
+    private void calcDrawK() {
+        Vector[] envRect = figure3D.bSpline.getEnvRect();
+        Vector leftUp = envRect[0];
+        Vector rightDown = envRect[1];
+
+        double maxX = Math.max(Math.abs(leftUp.getX()), Math.abs(rightDown.getX()));
+        double maxY = Math.max(Math.abs(leftUp.getY()), Math.abs(rightDown.getY()));
+
+        drawK = Math.min(centerP.getX() * 0.9 / maxX, centerP.getY() * 0.9 / maxY);
     }
 
     private void mouseListenerInit() {
@@ -434,6 +445,24 @@ class GraphViewPanel extends JPanel {
             pointI += 1;
         }
 
+    }
+
+    private void drawMarks(Graphics2D g2d) {
+        g2d.setColor(Color.WHITE);
+        for (int i = 0; i < centerP.getX() / drawK; ++i) {
+            g2d.drawLine((int) (centerP.getX() - i * drawK), centerP.getY() - pointRectSide / 2,
+                    (int) (centerP.getX() - i * drawK),  centerP.getY() + pointRectSide / 2);
+
+            g2d.drawLine((int) (centerP.getX() + i * drawK), centerP.getY() - pointRectSide / 2,
+                    (int) (centerP.getX() + i * drawK),  centerP.getY() + pointRectSide / 2);
+        }
+
+        for (int i = 0; i < centerP.getY() / drawK; ++i) {
+            g2d.drawLine(centerP.getX() - pointRectSide / 2, (int) (centerP.getY() - i * drawK),
+                    centerP.getX() + pointRectSide / 2, (int) (centerP.getY() - i * drawK));
+            g2d.drawLine(centerP.getX() - pointRectSide / 2, (int) (centerP.getY() + i * drawK),
+                    centerP.getX() + pointRectSide / 2, (int) (centerP.getY() + i * drawK));
+        }
     }
 
     public void reCalcObjects() {
