@@ -1,6 +1,8 @@
 package wireframe;
 
+import wireframe.matrix.Matrix;
 import wireframe.matrix.Vector;
+import wireframe.matrix.errors.MatrixDimensionException;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -10,22 +12,37 @@ public class Figure3D {
     public BSpline bSpline;
     public Color color;
     public Vector[][] points3D;
+    public Vector axisX, axisY, axisZ;
+    private Matrix rotateMat;
+    private Matrix positionMat;
+
+    private int uMax, vMax;
+    private int k;
+    private int n;
+    private int m;
 
     public Figure3D() {
         bSpline = new BSpline();
         color = new Color(0, 150, 150);
+
+        rotateMat = new Matrix(4);
+        rotateMat.setDiagonal(1);
+
+        positionMat = new Matrix(4);
+        positionMat.setDiagonal(1);
     }
 
     public Figure3D(Figure3D figure3D) {
-        bSpline = figure3D.bSpline;
+        bSpline = new BSpline(figure3D.bSpline);
         color = figure3D.color;
+        rotateMat = figure3D.rotateMat.copy();
     }
 
     public void calcPoints(Model model) {
         int[] paramsInt = model.getIntParams();
-        int n = paramsInt[0];
-        int m = paramsInt[1];
-        int k = paramsInt[2];
+        n = paramsInt[0];
+        m = paramsInt[1];
+        k = paramsInt[2];
 
         double[] paramsDouble = model.getParamsDouble();
 
@@ -34,7 +51,10 @@ public class Figure3D {
         double c = paramsDouble[2];
         double d = paramsDouble[3];
 
-        points3D = new Vector[n * k][m];
+        uMax = n * k;
+        vMax = m;
+
+        points3D = new Vector[m][n * k];
 
         for (int u = 0; u < n * k; ++u) {
             double curL = u * (b - a) / (double) (n * k) + a;
@@ -47,8 +67,76 @@ public class Figure3D {
                 point3D.setX(point2D.getY() * Math.cos(phi));
                 point3D.setY(point2D.getY() * Math.sin(phi));
                 point3D.setZ(point2D.getX());
-                points3D[u][v] = point3D;
+                points3D[v][u] = point3D;
             }
         }
+
+        axisX = new Vector(1, 0, 0);
+        axisY = new Vector(0, 1, 0);
+        axisZ = new Vector(0, 0, 1);
+    }
+
+    public Matrix getToWorldMatrix() {
+        try {
+            return positionMat.multiple(rotateMat);
+        } catch (MatrixDimensionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Vector> getPoints() {
+        List<Vector> points = new ArrayList<>();
+
+        points.add(new Vector(0, 0, 0, 1)); // 0
+        points.add(new Vector(1, 0, 0, 1)); // 1
+        points.add(new Vector(0, 1, 0, 1)); // 2
+        points.add(new Vector(0, 0, 1, 1)); // 3
+
+        for (Vector[] aPoints3D : points3D) {
+            for (Vector oldPoint : aPoints3D) {
+                points.add(new Vector(oldPoint.getX(), oldPoint.getY(), oldPoint.getZ(), 1));
+            }
+        }
+
+        return points;
+    }
+
+    public List<int[]> getLinks() {
+
+        List<int[]> links = new ArrayList<>();
+        links.add(new int[]{0, 1});
+        links.add(new int[]{0, 2});
+        links.add(new int[]{0, 3});
+
+        for (int v = 0; v < vMax - 1; ++v) {
+            for (int u = 0; u < uMax - 1; ++u) {
+                int curPointI = 4 + v * uMax + u;
+                links.add(new int[] {
+                        curPointI,
+                        curPointI + 1
+                });
+                if (u % n == 0) {
+                    links.add(new int[]{
+                            curPointI,
+                            curPointI + uMax
+                    });
+                }
+            }
+        }
+
+        return links;
+    }
+
+    public void setRotateMat(Matrix rotateMat) {
+        this.rotateMat = rotateMat.copy();
+    }
+
+    public void setPositionMat(Matrix positionMat) {
+        this.positionMat = positionMat;
+    }
+
+    public void rotate(double phiX, double phiY, double phiZ) {
+
     }
 }

@@ -6,7 +6,7 @@ import wireframe.matrix.errors.MatrixDimensionException;
 
 
 public class Homogeneous {
-    static Matrix Translate3D(double tx, double ty, double tz) {
+    public static Matrix Translate3D(double tx, double ty, double tz) {
         Matrix m = new Matrix(4);
         m.setDiagonal(1);
         try {
@@ -18,13 +18,13 @@ public class Homogeneous {
         return null;
     }
 
-    static Matrix Scale3D(double sx, double sy, double sz) {
+    public static Matrix Scale3D(double sx, double sy, double sz) {
         Matrix m = new Matrix(4);
         m.setDiagonal(new double[] {sx, sy, sz, 1});
         return m;
     }
 
-    static Matrix RotateX(double phi) {
+    public static Matrix RotateX(double phi) {
         Matrix m = new Matrix(4);
         m.setDiagonal(1);
         try {
@@ -37,7 +37,7 @@ public class Homogeneous {
         return null;
     }
 
-    static Matrix RotateY(double phi) {
+    public static Matrix RotateY(double phi) {
         Matrix m = new Matrix(4);
         m.setDiagonal(1);
         try {
@@ -50,7 +50,7 @@ public class Homogeneous {
         return null;
     }
 
-    static Matrix RotateZ(double phi) {
+    public static Matrix RotateZ(double phi) {
         Matrix m = new Matrix(4);
         m.setDiagonal(1);
         try {

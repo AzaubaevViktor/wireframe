@@ -1,12 +1,16 @@
 package wireframe;
 
+import wireframe.matrix.Vector;
+import wireframe.vision.Camera;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Model {
     private int[] paramsInt = new int[] {10, 10, 5}; // n, m, k
-    private double[] paramsDouble = new double[] {0, 1, 0, 6.28, 5, 15, 1, 1}; // a b c d zn zf sw sh
+    private double[] paramsDouble = new double[] {0, 1, 0, 6.28, 10, 15, 1, 1}; // a b c d zn zf sw sh
     private List<Figure3D> figures = new ArrayList<Figure3D>();
+    public Camera camera = new Camera();
 
     public Model() {
         figures.add(new Figure3D());
@@ -45,4 +49,6 @@ public class Model {
     public double getdL() {
         return (getB() - getA()) / (double) (getN() * getK());
     }
+
+    public double getZn() { return paramsDouble[4]; }
 }

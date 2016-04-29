@@ -57,6 +57,13 @@ public class Vector {
         return s;
     }
 
+    public void addAxis(int value) {
+        double[] newValues = new double[values.length + 1];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[values.length] = value;
+        values = newValues;
+    }
+
     // GETTER + SETTER
 
     public Matrix getMatrix(boolean isRow) {
@@ -95,6 +102,7 @@ public class Vector {
     public double getX() { return get(0); }
     public double getY() { return get(1); }
     public double getZ() { return get(2); }
+    public double getA() { return get(3); }
     public double getX2() { return get(2); }
     public double getY2() { return get(3); }
 
@@ -163,6 +171,17 @@ public class Vector {
 
     public Matrix multiple(Matrix m) throws MatrixDimensionException {
         return this.getMatrix(true).multiple(m);
+    }
+
+    public Vector vecMultiple(Vector v) throws VectorDimensionException {
+        if (values.length != v.values.length) {
+            throw new VectorDimensionException(this, v, "plus");
+        }
+        return new Vector(
+                this.getY() * v.getZ() - this.getZ() * v.getY(),
+                this.getZ() * v.getX() - this.getX() * v.getZ(),
+                this.getX() * v.getY() - this.getY() * v.getX()
+        );
     }
 
     public double distance2(Vector v) throws VectorDimensionException {

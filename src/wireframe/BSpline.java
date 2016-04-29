@@ -27,13 +27,13 @@ public class BSpline {
     }, 1./6.);
 
     private void generateStart6Points() {
-        points.add(new Vector(-2, -1));
-        points.add(new Vector(-1, 1));
-        points.add(new Vector(1, 1));
-        points.add(new Vector(1, -1));
-        points.add(new Vector(1, -2));
-        points.add(new Vector(0, -1));
-        points.add(new Vector(2, -1));
+        points.add(new Vector(-200, -100));
+        points.add(new Vector(-100,  100));
+        points.add(new Vector( 100,  100));
+        points.add(new Vector( 100, -100));
+        points.add(new Vector( 100, -200));
+        points.add(new Vector(   0, -100));
+        points.add(new Vector( 200, -100));
     }
 
     public BSpline(){
