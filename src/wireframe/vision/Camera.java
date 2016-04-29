@@ -9,9 +9,9 @@ import java.util.List;
 
 public class Camera {
     // Camera, viewport and up-vector
-    private Vector PCam = new Vector(1, 0, 0, 1);
+    private Vector PCam = new Vector(0, 1, 0, 0.1);
     private Vector PView = new Vector(0, 0, 0, 1);
-    private Vector Vup = new Vector(0, 1, 0, 1);
+    private Vector Vup = new Vector(0, 0, 1, 1);
     private Matrix MCam;
 
     public Camera() {

@@ -3,6 +3,7 @@ package wireframe;
 import wireframe.matrix.Matrix;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.MatrixDimensionException;
+import wireframe.transitions.Homogeneous;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -17,9 +18,8 @@ public class Figure3D {
     private Matrix positionMat;
 
     private int uMax, vMax;
-    private int k;
-    private int n;
-    private int m;
+    private int k, n, m;
+    private double a, b, c, d;
 
     public Figure3D() {
         bSpline = new BSpline();
@@ -33,9 +33,14 @@ public class Figure3D {
     }
 
     public Figure3D(Figure3D figure3D) {
+        apply(figure3D);
+    }
+
+    public void apply(Figure3D figure3D) {
         bSpline = new BSpline(figure3D.bSpline);
         color = figure3D.color;
         rotateMat = figure3D.rotateMat.copy();
+        positionMat = figure3D.positionMat.copy();
     }
 
     public void calcPoints(Model model) {
@@ -46,10 +51,10 @@ public class Figure3D {
 
         double[] paramsDouble = model.getParamsDouble();
 
-        double a = paramsDouble[0];
-        double b = paramsDouble[1];
-        double c = paramsDouble[2];
-        double d = paramsDouble[3];
+        a = paramsDouble[0];
+        b = paramsDouble[1];
+        c = paramsDouble[2];
+        d = paramsDouble[3];
 
         uMax = n * k;
         vMax = m;
@@ -64,6 +69,7 @@ public class Figure3D {
             for (int v = 0; v < m; ++v) {
                 Vector point3D = new Vector(3);
                 double phi = v * (d - c) / (double) m + c;
+
                 point3D.setX(point2D.getY() * Math.cos(phi));
                 point3D.setY(point2D.getY() * Math.sin(phi));
                 point3D.setZ(point2D.getX());
@@ -109,21 +115,32 @@ public class Figure3D {
         links.add(new int[]{0, 2});
         links.add(new int[]{0, 3});
 
-        for (int v = 0; v < vMax - 1; ++v) {
-            for (int u = 0; u < uMax - 1; ++u) {
+
+        for (int v = 0; v < vMax; ++v) {
+            for (int u = 0; u < uMax; ++u) {
                 int curPointI = 4 + v * uMax + u;
-                links.add(new int[] {
-                        curPointI,
-                        curPointI + 1
-                });
-                if (u % n == 0) {
+                if (u < uMax - 1) {
                     links.add(new int[]{
                             curPointI,
-                            curPointI + uMax
+                            curPointI + 1
                     });
+                }
+                if ((u % k == 0) || (u == uMax - 1)) {
+                    if (v < vMax - 1) {
+                        links.add(new int[]{
+                                curPointI,
+                                curPointI + uMax
+                        });
+                    } else {
+                        links.add(new int[]{
+                                curPointI,
+                                curPointI - uMax * (vMax - 1)
+                        });
+                    }
                 }
             }
         }
+
 
         return links;
     }
@@ -136,7 +153,19 @@ public class Figure3D {
         this.positionMat = positionMat;
     }
 
-    public void rotate(double phiX, double phiY, double phiZ) {
+    public void rotateX(double phiX) {
+        try {
+            rotateMat = Homogeneous.RotateX(phiX).multiple(rotateMat);
+        } catch (MatrixDimensionException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void rotateY(double phiY) {
+        try {
+            rotateMat = Homogeneous.RotateY(phiY).multiple(rotateMat);
+        } catch (MatrixDimensionException e) {
+            e.printStackTrace();
+        }
     }
 }

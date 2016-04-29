@@ -54,7 +54,7 @@ public class BSplineWin extends JDialog {
 
         graphViewPanel = new GraphViewPanel(model);
 
-        graphViewPanel.setFigure3D(new Figure3D());
+        graphViewPanel.setFigure3D(model.getFigure(0));
         add(graphViewPanel, gbc);
     }
 
@@ -143,7 +143,7 @@ public class BSplineWin extends JDialog {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        method.invoke(this, e);
+                        method.invoke(BSplineWin.this);
                     } catch (Exception err) {
                         throw new RuntimeException(err);
                     }
@@ -178,7 +178,7 @@ public class BSplineWin extends JDialog {
 
     private void addAllButtons() {
         addButton("Ok");
-        addButton("Apply");
+        addButton("Apply", "applyButton");
         addButton("Cancel");
     }
 
@@ -190,6 +190,10 @@ public class BSplineWin extends JDialog {
         intParams[1] = (int) ((JFormattedTextField) getComponentByName("m")).getValue();
         intParams[2] = (int) ((JFormattedTextField) getComponentByName("k")).getValue();
         model.setIntParams(intParams);
+    }
+
+    public void applyButton() {
+        graphViewPanel.applyFigure();
     }
 }
 
@@ -486,5 +490,12 @@ class GraphViewPanel extends JPanel {
         this.figure3DOrigin = figure3D;
         this.figure3D = new Figure3D(this.figure3DOrigin);
         reCalcObjects();
+    }
+
+    // Buttons
+
+    public void applyFigure() {
+        figure3DOrigin.apply(figure3D);
+        figure3DOrigin.calcPoints(model);
     }
 }
