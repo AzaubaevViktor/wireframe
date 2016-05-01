@@ -94,6 +94,15 @@ class ViewPortPanel extends JPanel {
                 repaint();
             }
         });
+        addMouseWheelListener(new MouseAdapter() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                model.camera.zoom(e.getPreciseWheelRotation());
+                repaint();
+            }
+
+        });
     }
 
     private void componentListenerInit() {

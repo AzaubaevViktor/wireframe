@@ -30,6 +30,8 @@ public class Figure3D {
 
         positionMat = new Matrix(4);
         positionMat.setDiagonal(1);
+
+        positionMat = Homogeneous.Translate3D(0, 0, -10);
     }
 
     public Figure3D(Figure3D figure3D) {

@@ -1,5 +1,6 @@
 package wireframe.vision;
 
+import sun.nio.cs.ext.PCK;
 import wireframe.matrix.Matrix;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.MatrixDimensionException;
@@ -11,14 +12,23 @@ public class Camera {
     // Camera, viewport and up-vector
     private Vector PCam = new Vector(0, 0, 10, 0);
     private Vector PView = new Vector(0, 0, 0, 0);
+    private Vector Vn;
     private Vector Vup = new Vector(0, 1, 0, 0);
     private Matrix MCam;
 
     public Camera() {
+        try {
+            Vn = PCam.minus(PView).normalize();
+        } catch (VectorDimensionException e) {
+            e.printStackTrace();
+        }
+        initMCam();
+    }
+
+    private void initMCam() {
         MCam = new Matrix(4);
         MCam.setDiagonal(1);
         try {
-            Vector Vn = PCam.minus(PView).normalize();
             Vector Vx = Vn.vecMultiple(Vup);
             Vx.addAxis(0);
 
@@ -48,6 +58,16 @@ public class Camera {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void zoom(double k) {
+        try {
+            PCam = PCam.move(Vn, k);
+            System.out.println(PCam);
+            initMCam();
+        } catch (VectorDimensionException e) {
+            e.printStackTrace();
+        }
     }
 
 }
