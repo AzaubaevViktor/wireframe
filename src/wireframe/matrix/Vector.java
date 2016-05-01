@@ -158,7 +158,20 @@ public class Vector {
         return plus(v, k);
     }
 
-    public double multipleSum(Vector v) throws VectorDimensionException {
+    public Vector normalize() {
+        Vector result = new Vector(this.length());
+        try {
+            double len = this.distance(result);
+            for (int i = 0; i < this.length(); ++i) {
+                result.values[i] = this.values[i] / len;
+            }
+        } catch (VectorDimensionException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public double scalarMul(Vector v) throws VectorDimensionException {
         if (values.length != v.values.length) {
             throw new VectorDimensionException(this, v, "plus");
         }

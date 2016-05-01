@@ -95,9 +95,9 @@ public class Figure3D {
         List<Vector> points = new ArrayList<>();
 
         points.add(new Vector(0, 0, 0, 1)); // 0
-        points.add(new Vector(1, 0, 0, 1)); // 1
-        points.add(new Vector(0, 1, 0, 1)); // 2
-        points.add(new Vector(0, 0, 1, 1)); // 3
+        points.add(new Vector(40, 0, 0, 1)); // 1
+        points.add(new Vector(0, 30, 0, 1)); // 2
+        points.add(new Vector(0, 0, 20, 1)); // 3
 
         for (Vector[] aPoints3D : points3D) {
             for (Vector oldPoint : aPoints3D) {

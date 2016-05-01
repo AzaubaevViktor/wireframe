@@ -196,7 +196,7 @@ public class Matrix {
         for (int h = 0; h < this.height; h++) {
             for (int w = 0; w < m.width; w++) {
                 try {
-                    result.values[h][w] = this.getRow(h).multipleSum(m.getColumn(w));
+                    result.values[h][w] = this.getRow(h).scalarMul(m.getColumn(w));
                 } catch (VectorDimensionException ve) {
                     System.out.println("Ну нахуй, не может такого быть Оо\n" + ve);
                 }

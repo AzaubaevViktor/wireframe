@@ -10,9 +10,7 @@ import wireframe.vision.Camera;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +69,7 @@ class ViewPortPanel extends JPanel {
         setSize(640, 480);
         changeSize();
         mouseListenerInit();
+        componentListenerInit();
         setVisible(true);
     }
 
@@ -97,6 +96,28 @@ class ViewPortPanel extends JPanel {
         });
     }
 
+    private void componentListenerInit() {
+        addComponentListener(new ComponentListener() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                changeSize();
+                repaint();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+            }
+        });
+    }
 
     private void changeSize() {
         Dimension size = getSize();
@@ -105,8 +126,8 @@ class ViewPortPanel extends JPanel {
 
     private void changeSize(int width, int height) {
         setSize(width, height);
-        centerP.setX(width);
-        centerP.setY(height);
+        centerP.setX(width / 2);
+        centerP.setY(height / 2);
     }
 
     @Override
@@ -126,19 +147,18 @@ class ViewPortPanel extends JPanel {
 
         Matrix figureToCamMat = null;
 
-//        try {
-//            figureToCamMat = worldToViewPortMat.multiple(figureToWorldMat);
-            figureToCamMat = figureToWorldMat;
-//        } catch (MatrixDimensionException e) {
-//            e.printStackTrace();
-//            return;
-//        }
+        try {
+            figureToCamMat = worldToViewPortMat.multiple(figureToWorldMat);
+//            figureToCamMat = figureToWorldMat;
+        } catch (MatrixDimensionException e) {
+            e.printStackTrace();
+            return;
+        }
 
         List<Vector> camPoints = new ArrayList<>();
         try {
             for (Vector point: points) {
                 camPoints.add(figureToCamMat.multiple(point));
-//                camPoints.add(point);
             }
         } catch (MatrixDimensionException e) {
             e.printStackTrace();
@@ -146,11 +166,11 @@ class ViewPortPanel extends JPanel {
 
         for (int[] link: links) {
             Vector first = camPoints.get(link[0]);
-            if (Math.abs(first.getA()) > 0.01) {
+            if (Math.abs(first.getA()) > 0.00000001) {
                 first.multiple(1 / first.getA());
             }
             Vector second = camPoints.get(link[1]);
-            if (Math.abs(second.getA()) > 0.01) {
+            if (Math.abs(second.getA()) > 0.00000001) {
                 second.multiple(1 / second.getA());
             }
 
@@ -167,9 +187,7 @@ class ViewPortPanel extends JPanel {
                     && (y2 > 0) && (y2 < size.height)) {
                 g2d.drawLine(x1, y1, x2, y2);
             }
-
         }
-
     }
 
 }
