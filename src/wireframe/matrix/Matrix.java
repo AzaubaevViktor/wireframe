@@ -106,6 +106,10 @@ public class Matrix {
         values[y] = row.clone();
     }
 
+    public void setRow(int y, Vector row) throws MatrixDimensionException {
+        setRow(y, row.getValues());
+    }
+
     public void setColumn(int x, double [] column) throws MatrixDimensionException {
         if (column.length != height) {
             throw new MatrixDimensionException("Высота заполняемого массива не соответствует длинне массива. " +

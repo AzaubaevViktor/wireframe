@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Camera {
     // Camera, viewport and up-vector
-    private Vector PCam = new Vector(0, 0, 10, 0);
+    private Vector PCam = new Vector(0, 0, -10, 0);
     private Vector PView = new Vector(0, 0, 0, 0);
     private Vector Vn;
     private Vector Vup = new Vector(0, 1, 0, 0);
@@ -32,17 +32,17 @@ public class Camera {
             Vector Vx = Vn.vecMultiple(Vup);
             Vx.addAxis(0);
 
-            MCam.setColumn(0, Vx);
-            MCam.setColumn(1, Vup);
-            MCam.setColumn(2, Vn);
+            MCam.setRow(0, Vx);
+            MCam.setRow(1, Vup);
+            MCam.setRow(2, Vn);
 
-            MCam.setRow(3, new double[] {
+            MCam.setColumn(3, new double[] {
                     - PCam.scalarMul(Vx),
                     - PCam.scalarMul(Vup),
                     - PCam.scalarMul(Vn),
-                    1
+                    0
             });
-            MCam = MCam.transpone();
+            System.out.println(MCam);
         } catch (VectorDimensionException | MatrixDimensionException e) {
             e.printStackTrace();
         }
@@ -50,8 +50,8 @@ public class Camera {
 
     public Matrix getWorldToViewPortMat(double zn) {
         Matrix Mpsp = new Matrix(4);
-        Mpsp.setDiagonal(new double[] {1, 1, 1, 1});
-        Mpsp.set(2, 3, - 1. / zn);
+        Mpsp.setDiagonal(new double[] {1, 1, 1, 0});
+        Mpsp.set(2, 3,  1. / zn);
         try {
             return Mpsp.multiple(MCam);
         } catch (MatrixDimensionException e) {
@@ -62,7 +62,7 @@ public class Camera {
 
     public void zoom(double k) {
         try {
-            PCam = PCam.move(Vn, k);
+            PCam = PCam.move(Vn, k / 5.);
             System.out.println(PCam);
             initMCam();
         } catch (VectorDimensionException e) {

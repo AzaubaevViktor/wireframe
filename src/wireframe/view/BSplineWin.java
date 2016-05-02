@@ -237,8 +237,8 @@ class GraphViewPanel extends JPanel {
         g2d.drawLine(0, centerP.getY(), size.getX(), centerP.getY());
         g2d.drawLine(centerP.getX(), 0, centerP.getX(), size.getY());
         reCalcObjects();
-        drawBSpline(g2d);
         drawMarks(g2d);
+        drawBSpline(g2d);
 
         mouseListenerInit();
         componentListenerInit();

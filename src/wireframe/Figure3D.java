@@ -31,7 +31,7 @@ public class Figure3D {
         positionMat = new Matrix(4);
         positionMat.setDiagonal(1);
 
-        positionMat = Homogeneous.Translate3D(0, 0, -10);
+        positionMat = Homogeneous.Translate3D(0, 0, 200);
     }
 
     public Figure3D(Figure3D figure3D) {
@@ -97,9 +97,9 @@ public class Figure3D {
         List<Vector> points = new ArrayList<>();
 
         points.add(new Vector(0, 0, 0, 1)); // 0
-        points.add(new Vector(40, 0, 0, 1)); // 1
-        points.add(new Vector(0, 30, 0, 1)); // 2
-        points.add(new Vector(0, 0, 20, 1)); // 3
+        points.add(new Vector(10, 0, 0, 1)); // 1
+        points.add(new Vector(0, 10, 0, 1)); // 2
+        points.add(new Vector(0, 0, 10, 1)); // 3
 
         for (Vector[] aPoints3D : points3D) {
             for (Vector oldPoint : aPoints3D) {
