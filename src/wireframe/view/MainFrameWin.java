@@ -175,10 +175,13 @@ class ViewPortPanel extends JPanel {
 
         for (int[] link: links) {
             Vector first = camPoints.get(link[0]);
+            int z1 = (int) first.getZ();
             if (Math.abs(first.getA()) > 0.00000001) {
                 first.multiple(1 / first.getA());
             }
+
             Vector second = camPoints.get(link[1]);
+            int z2 = (int) second.getZ();
             if (Math.abs(second.getA()) > 0.00000001) {
                 second.multiple(1 / second.getA());
             }
@@ -187,6 +190,7 @@ class ViewPortPanel extends JPanel {
             int y1 = (int) (first.getY() + centerP.getY());
             int x2 = (int) (second.getX() + centerP.getX());
             int y2 = (int) (second.getY() + centerP.getY());
+//            int z1 = (int) (first.getZ() * )
 
             Dimension size = getSize();
 
@@ -194,6 +198,7 @@ class ViewPortPanel extends JPanel {
                     && (x2 > 0) && (x2 < size.width)
                     && (y1 > 0) && (y1 < size.height)
                     && (y2 > 0) && (y2 < size.height)) {
+                g2d.setColor(new Color(Math.abs(z2 - z1) * 6 % 255, 0, 0));
                 g2d.drawLine(x1, y1, x2, y2);
             }
         }
