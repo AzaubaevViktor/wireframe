@@ -87,7 +87,7 @@ class ViewPortPanel extends JPanel {
             public void mouseDragged(MouseEvent e) {
                 Point2DI curMouse = new Point2DI(e.getX(), e.getY());
 
-                model.getFigure(0).rotateX((curMouse.getY() - lastMouse.getY()) / 100.);
+                model.getFigure(0).rotateX(- (curMouse.getY() - lastMouse.getY()) / 100.);
                 model.getFigure(0).rotateY((curMouse.getX() - lastMouse.getX()) / 100.);
 
                 lastMouse = curMouse;
@@ -98,7 +98,7 @@ class ViewPortPanel extends JPanel {
 
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                model.camera.zoom(e.getPreciseWheelRotation());
+                model.zoom(e.getPreciseWheelRotation());
                 repaint();
             }
 

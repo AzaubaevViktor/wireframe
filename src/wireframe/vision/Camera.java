@@ -1,12 +1,9 @@
 package wireframe.vision;
 
-import sun.nio.cs.ext.PCK;
 import wireframe.matrix.Matrix;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.MatrixDimensionException;
 import wireframe.matrix.errors.VectorDimensionException;
-
-import java.util.List;
 
 public class Camera {
     // Camera, viewport and up-vector
@@ -29,7 +26,7 @@ public class Camera {
         MCam = new Matrix(4);
         MCam.setDiagonal(1);
         try {
-            Vector Vx = Vn.vecMultiple(Vup);
+            Vector Vx = Vn.vecMultiple3(Vup);
             Vx.addAxis(0);
 
             MCam.setRow(0, Vx);
@@ -58,16 +55,6 @@ public class Camera {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public void zoom(double k) {
-        try {
-            PCam = PCam.move(Vn, k / 5.);
-            System.out.println(PCam);
-            initMCam();
-        } catch (VectorDimensionException e) {
-            e.printStackTrace();
-        }
     }
 
 }

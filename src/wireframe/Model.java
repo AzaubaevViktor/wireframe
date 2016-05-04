@@ -51,4 +51,9 @@ public class Model {
     }
 
     public double getZn() { return paramsDouble[4]; }
+
+    public void zoom(double k) {
+        paramsDouble[4] += k / 5.;
+        paramsDouble[5] += k / 5.;
+    }
 }

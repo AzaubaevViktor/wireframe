@@ -173,7 +173,7 @@ public class Vector {
 
     public double scalarMul(Vector v) throws VectorDimensionException {
         if (values.length != v.values.length) {
-            throw new VectorDimensionException(this, v, "plus");
+            throw new VectorDimensionException(this, v, "scalarMul");
         }
         double sum = 0.;
         for (int i = 0; i < values.length; ++i) {
@@ -186,9 +186,9 @@ public class Vector {
         return this.getMatrix(true).multiple(m);
     }
 
-    public Vector vecMultiple(Vector v) throws VectorDimensionException {
+    public Vector vecMultiple3(Vector v) throws VectorDimensionException {
         if (values.length != v.values.length) {
-            throw new VectorDimensionException(this, v, "plus");
+            throw new VectorDimensionException(this, v, "vecMultiple3");
         }
         return new Vector(
                 this.getY() * v.getZ() - this.getZ() * v.getY(),
@@ -199,7 +199,7 @@ public class Vector {
 
     public double distance2(Vector v) throws VectorDimensionException {
         if (values.length != v.values.length) {
-            throw new VectorDimensionException(this, v, "plus");
+            throw new VectorDimensionException(this, v, "distance2");
         }
         double d2 = 0;
         for (int i = 0; i < values.length; ++i) {
@@ -215,7 +215,7 @@ public class Vector {
     public Vector divided(Vector v, double a) throws VectorDimensionException {
         // this -----a----- result ---1--- p
         if (values.length != v.values.length) {
-            throw new VectorDimensionException(this, v, "plus");
+            throw new VectorDimensionException(this, v, "divided");
         }
 
         Vector diff = v.minus(this);
