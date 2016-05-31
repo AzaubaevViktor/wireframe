@@ -8,9 +8,10 @@ import java.util.List;
 
 public class Model {
     private int[] paramsInt = new int[] {10, 20, 50}; // n, m, k
-    private double[] paramsDouble = new double[] {0, 1, 0, 6.28, 10, 15, 1, 1}; // a b c d zn zf sw sh
+    private double[] paramsDouble = new double[] {0, 1, 0, 6.28, 10, 1000, 1, 1}; // a b c d zn zf sw sh
     private List<Figure3D> figures = new ArrayList<Figure3D>();
     public Camera camera = new Camera();
+    private double zf;
 
     public Model() {
         figures.add(new Figure3D());
@@ -53,7 +54,15 @@ public class Model {
     public double getZn() { return paramsDouble[4]; }
 
     public void zoom(double k) {
-        paramsDouble[4] += k / 5.;
-        paramsDouble[5] += k / 5.;
+        paramsDouble[4] += k;
+        paramsDouble[5] += k;
+    }
+
+    public double getZf() {
+        return paramsDouble[5];
+    }
+
+    public void setZf(double zf) {
+        paramsDouble[5] = zf;
     }
 }

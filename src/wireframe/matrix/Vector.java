@@ -224,6 +224,11 @@ public class Vector {
         return this.plus(diff);
     }
 
+    public Vector divided(Vector v, double a, double b) throws VectorDimensionException {
+        // this -----a----- result ---b--- p
+        return divided(v, a / b);
+    }
+
     public double calcPolynomial(double t) {
         double result = 0;
         for (int i = 0; i < values.length; ++i) {

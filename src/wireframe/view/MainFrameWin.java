@@ -5,6 +5,7 @@ import wireframe.Model;
 import wireframe.matrix.*;
 import wireframe.matrix.Vector;
 import wireframe.matrix.errors.MatrixDimensionException;
+import wireframe.matrix.errors.VectorDimensionException;
 import wireframe.pixel.Point2DI;
 import wireframe.vision.Camera;
 
@@ -62,6 +63,7 @@ class ViewPortPanel extends JPanel {
     private final Model model;
     private Vector centerP = new Vector(0, 0);
     private Point2DI lastMouse;
+    private Vector maxCrop = new Vector(3), minCrop = new Vector(3);
 
     ViewPortPanel(Model model) {
         super();
@@ -98,11 +100,17 @@ class ViewPortPanel extends JPanel {
 
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                model.zoom(e.getPreciseWheelRotation());
+                zoom(e);
                 repaint();
             }
 
         });
+    }
+
+    private void zoom(MouseWheelEvent e) {
+        model.zoom(e.getPreciseWheelRotation());
+        minCrop.setZ(model.getZn());
+        maxCrop.setZ(model.getZf());
     }
 
     private void componentListenerInit() {
@@ -137,7 +145,56 @@ class ViewPortPanel extends JPanel {
         setSize(width, height);
         centerP.setX(width / 2);
         centerP.setY(height / 2);
+        // ПОПРАВИТЬ
+        minCrop.setX(-1000);
+        minCrop.setY(-1000 - centerP.getY());
+        maxCrop.setX(1000 - centerP.getX());
+        maxCrop.setY(1000 - centerP.getY());
     }
+
+    // CROP
+
+    private boolean cropVector(Vector first, Vector second, int pos, double left, double right) {
+        double c1 = first.get(pos);
+        double c2 = second.get(pos);
+        if ((c1 < left) && (c2 < left)) return false;
+        if ((c1 > right) && (c2 > right)) return false;
+        try {
+            if ((c1 < left) && (left < c2)) first.apply(first.divided(second, c2 - left, left - c1));
+            if ((c1 > right) && (right > c2)) second.apply(second.divided(first, c2 - right, right - c1));
+            return true;
+        } catch (VectorDimensionException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void cropAndDrawLine(Graphics2D g2d, Vector first, Vector second) {
+        int z1 = (int) first.getZ();
+        if (Math.abs(first.getA()) > 0.00000001) {
+            first.multiple(1 / first.getA());
+        }
+        first.setZ(z1);
+
+        int z2 = (int) second.getZ();
+        if (Math.abs(second.getA()) > 0.00000001) {
+            second.multiple(1 / second.getA());
+        }
+        second.setZ(z2);
+
+        if (/*cropVector(first, second, 0, minCrop.getX() , maxCrop.getX())
+                && cropVector(first, second, 1, minCrop.getY(), maxCrop.getY())
+                && cropVector(first, second, 2, minCrop.getZ(), maxCrop.getZ())*/true) {
+            g2d.setColor(new Color(Math.abs(z2 - z1) * 6 % 255, 0, 0));
+            int x1 = (int) (first.getX() + centerP.getX());
+            int y1 = (int) (first.getY() + centerP.getY());
+            int x2 = (int) (second.getX() + centerP.getX());
+            int y2 = (int) (second.getY() + centerP.getY());
+            g2d.drawLine(x1, y1, x2, y2);
+        }
+    }
+
+    // DRAWING ALL
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -174,34 +231,10 @@ class ViewPortPanel extends JPanel {
         }
 
         for (int[] link: links) {
-            Vector first = camPoints.get(link[0]);
-            int z1 = (int) first.getZ();
-            if (Math.abs(first.getA()) > 0.00000001) {
-                first.multiple(1 / first.getA());
-            }
-
-            Vector second = camPoints.get(link[1]);
-            int z2 = (int) second.getZ();
-            if (Math.abs(second.getA()) > 0.00000001) {
-                second.multiple(1 / second.getA());
-            }
-
-            int x1 = (int) (first.getX() + centerP.getX());
-            int y1 = (int) (first.getY() + centerP.getY());
-            int x2 = (int) (second.getX() + centerP.getX());
-            int y2 = (int) (second.getY() + centerP.getY());
-//            int z1 = (int) (first.getZ() * )
-
-            Dimension size = getSize();
-
-            if ((x1 > 0) && (x1 < size.width)
-                    && (x2 > 0) && (x2 < size.width)
-                    && (y1 > 0) && (y1 < size.height)
-                    && (y2 > 0) && (y2 < size.height)) {
-                g2d.setColor(new Color(Math.abs(z2 - z1) * 6 % 255, 0, 0));
-                g2d.drawLine(x1, y1, x2, y2);
-            }
+            cropAndDrawLine(g2d, camPoints.get(link[0]), camPoints.get(link[1]));
         }
+
+        g2d.drawString("Zn:" + model.getZn(), 0, 20);
     }
 
 }

@@ -15,7 +15,7 @@ public class Camera {
 
     public Camera() {
         try {
-            Vn = PCam.minus(PView).normalize();
+            Vn = PView.minus(PCam).normalize();
         } catch (VectorDimensionException e) {
             e.printStackTrace();
         }
@@ -48,7 +48,7 @@ public class Camera {
     public Matrix getWorldToViewPortMat(double zn) {
         Matrix Mpsp = new Matrix(4);
         Mpsp.setDiagonal(new double[] {1, 1, 1, 0});
-        Mpsp.set(2, 3,  1. / zn);
+        Mpsp.set(2, 3, 1. / zn);
         try {
             return Mpsp.multiple(MCam);
         } catch (MatrixDimensionException e) {
